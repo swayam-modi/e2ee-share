@@ -20,6 +20,9 @@
     "@e2ee-share/protocol": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.7.3"
+    "@e2ee-share/server": "workspace:*",
+    "@types/ws": "^8.18.2",
+    "typescript": "^5.7.3",
+    "ws": "^8.22.1"
   }
 }
