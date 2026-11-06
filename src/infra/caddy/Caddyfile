@@ -1,0 +1,16 @@
+yourdomain.com {
+    # WebSocket signaling → standalone backend
+    handle /ws {
+        reverse_proxy server:3000
+    }
+
+    # REST API → standalone backend
+    handle /api/* {
+        reverse_proxy server:3000
+    }
+
+    # Everything else → Next.js
+    handle {
+        reverse_proxy web:3001
+    }
+}

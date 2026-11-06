@@ -1,13 +1,12 @@
 services:
-  app:
+  web:
     build:
-      context: .
+      context: ./apps/web-next
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-    env_file:
-      - .env
-    depends_on:
-      - coturn
+      - '3001:3001'
+    environment:
+      - PORT=3001
     restart: unless-stopped
 
   coturn:
@@ -20,15 +19,15 @@ services:
   caddy:
     image: caddy:2-alpine
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
     volumes:
       - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_certs:/etc/caddy/certs
     depends_on:
-      - app
+      - web
     restart: unless-stopped
 
   redis:
