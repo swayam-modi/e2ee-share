@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Check } from "lucide-react";
 import { formatCountdown } from "@/lib/format";
 import gsap from "gsap";
+import { QRCodeSVG } from "qrcode.react";
 
 export function ShareLinkCard({
   shareUrl,
@@ -45,23 +46,23 @@ export function ShareLinkCard({
   return (
     <div
       ref={cardRef}
-      className="rounded-xl border border-white/5 bg-card/80 backdrop-blur-sm p-5"
+      className="rounded-xl border border-border bg-card/80 backdrop-blur-sm p-5"
     >
-      <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-zinc-500 mb-3">
+      <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-3">
         Share Link
       </p>
       <div className="flex gap-2">
         <Input
           value={shareUrl}
           readOnly
-          className="bg-zinc-900 border-white/5 text-zinc-300 font-mono text-xs focus-visible:ring-primary"
+          className="bg-muted border-border text-foreground font-mono text-xs focus-visible:ring-primary"
         />
         <Button
           size="icon"
           variant="ghost"
           onClick={() => void copy()}
           aria-label="Copy link"
-          className="shrink-0 text-zinc-400 hover:text-white transition-colors"
+          className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
         >
           {copied ? (
             <Check className="h-4 w-4 text-success" />
@@ -70,14 +71,39 @@ export function ShareLinkCard({
           )}
         </Button>
       </div>
-      <p className="mt-3 text-xs text-zinc-500">
+
+      {/* QR Code */}
+      <div className="mt-4 flex flex-col items-center gap-2">
+        <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
+          Scan to open
+        </p>
+        <a
+          href={shareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-lg overflow-hidden border border-border p-2 bg-white hover:scale-105 transition-transform duration-200"
+          title="Scan QR code to open link"
+        >
+          <QRCodeSVG
+            value={shareUrl}
+            size={160}
+            level="M"
+            marginSize={1}
+            fgColor="#000000"
+            bgColor="#ffffff"
+            title="Scan to open share link"
+          />
+        </a>
+      </div>
+
+      <p className="mt-3 text-xs text-muted-foreground">
         Key lives in{" "}
-        <code className="rounded bg-white/5 px-1 py-0.5 font-mono">
+        <code className="rounded bg-muted px-1 py-0.5 font-mono">
           #fragment
         </code>
         {" — "}
         never sent to server.{" "}
-        <span className="text-zinc-600">Expires in {countdown}</span>
+        <span className="text-muted-foreground/60">Expires in {countdown}</span>
       </p>
     </div>
   );

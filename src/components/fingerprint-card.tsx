@@ -29,10 +29,10 @@ export function FingerprintCard({ fingerprint, hint }: { fingerprint: string; hi
   }, []);
 
   return (
-    <div ref={cardRef} className="rounded-xl border border-white/5 bg-card/80 backdrop-blur-sm p-5">
+    <div ref={cardRef} className="rounded-xl border border-border bg-card/80 backdrop-blur-sm p-5">
       <div className="flex items-center gap-2 mb-4">
         <ShieldCheck className="h-5 w-5 text-primary" />
-        <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-zinc-500">
+        <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
           Security Fingerprint
         </span>
       </div>
@@ -46,17 +46,17 @@ export function FingerprintCard({ fingerprint, hint }: { fingerprint: string; hi
               ref={(el) => {
                 groupsRef.current[i] = el;
               }}
-              className="font-mono tracking-[0.25em] text-3xl text-white"
+              className="font-mono tracking-[0.25em] text-3xl text-foreground"
             >
               {group}
             </span>
             {i < groups.length - 1 && (
-              <span className="font-mono text-3xl text-zinc-600 mx-1">-</span>
+              <span className="font-mono text-3xl text-muted-foreground/40 mx-1">-</span>
             )}
           </span>
         ))}
       </p>
-      {hint && <p className="mt-4 text-xs text-zinc-500 leading-relaxed text-center">{hint}</p>}
+      {hint && <p className="mt-4 text-xs text-muted-foreground leading-relaxed text-center">{hint}</p>}
     </div>
   );
 }

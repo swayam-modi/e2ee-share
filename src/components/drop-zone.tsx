@@ -72,11 +72,11 @@ export function DropZone({
         "relative rounded-xl border border-dashed p-8 text-center min-h-[200px]",
         "flex flex-col items-center justify-center",
         "transition-all duration-300 cursor-pointer outline-none",
-        "bg-[radial-gradient(circle,_theme(colors.white/0.06)_1px,_transparent_1px)] bg-[size:20px_20px]",
+        "bg-[radial-gradient(circle,_theme(colors.foreground/0.04)_1px,_transparent_1px)] bg-[size:20px_20px]",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         dragging
           ? "border-primary/60 bg-primary/5 shadow-[0_0_20px_theme(colors.primary/0.15)] scale-[1.01]"
-          : "border-white/10 hover:border-primary/40 hover:bg-white/[0.02]",
+          : "border-border hover:border-primary/40 hover:bg-muted/50",
         disabled && "pointer-events-none opacity-40",
       )}
     >
@@ -91,24 +91,24 @@ export function DropZone({
           e.target.value = "";
         }}
       />
-      <Upload className="h-10 w-10 text-zinc-500 mb-4" />
-      <p className="text-sm font-medium text-white">
+      <Upload className="h-10 w-10 text-muted-foreground mb-4" />
+      <p className="text-sm font-medium text-foreground">
         Drop files here or click to browse
       </p>
-      <p className="mt-1 text-xs text-zinc-500">
+      <p className="mt-1 text-xs text-muted-foreground">
         Any file type · encrypted before sending
       </p>
       {selectedFiles.length > 0 && (
         <>
-          <div className="mt-5 w-full border-t border-white/5" />
+          <div className="mt-5 w-full border-t border-border" />
           <ul ref={listRef} className="mt-4 w-full space-y-1 text-left">
             {selectedFiles.map((f, i) => (
               <li
                 key={i}
-                className="flex justify-between gap-2 text-xs text-zinc-400"
+                className="flex justify-between gap-2 text-xs text-muted-foreground"
               >
                 <span className="truncate">{f.name}</span>
-                <span className="shrink-0 tabular-nums text-zinc-500">
+                <span className="shrink-0 tabular-nums text-muted-foreground/70">
                   {formatBytes(f.size)}
                 </span>
               </li>

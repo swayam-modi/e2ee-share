@@ -8,6 +8,7 @@ import { FingerprintCard } from "@/components/fingerprint-card";
 import { StatusBanner } from "@/components/status-banner";
 import { ErrorScreen } from "@/components/error-screen";
 import { LockIcon } from "@/components/lock-icon";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -131,10 +132,13 @@ export function ReceiverView({ roomId }: { roomId: string }) {
         ref={headerRef}
         className="flex items-center justify-between mb-2"
       >
-        <h1 className="text-xl font-semibold tracking-tight text-white">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
           Receive Files Securely
         </h1>
-        <LockIcon />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <LockIcon />
+        </div>
       </header>
 
       {/* Error state */}
@@ -191,7 +195,7 @@ export function ReceiverView({ roomId }: { roomId: string }) {
       {/* File offers */}
       {state.fileOffers.length > 0 && state.phase !== "failed" && (
         <div ref={offersRef} className="flex flex-col gap-3">
-          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-zinc-500">
+          <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
             Incoming Files
           </p>
           {state.fileOffers.map(({ offer, status }) => {
@@ -204,14 +208,14 @@ export function ReceiverView({ roomId }: { roomId: string }) {
               <div
                 key={offer.fileIndex}
                 data-offer-card
-                className="rounded-xl border border-white/5 bg-card/80 backdrop-blur-sm p-4"
+                className="rounded-xl border border-border bg-card/80 backdrop-blur-sm p-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {offer.name}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {formatBytes(offer.size)}
                       {offer.mime ? ` · ${offer.mime}` : ""}
                     </p>
@@ -243,7 +247,7 @@ export function ReceiverView({ roomId }: { roomId: string }) {
                   {status === "declined" && (
                     <span
                       aria-label="File declined"
-                      className="shrink-0 text-xs text-zinc-500"
+                      className="shrink-0 text-xs text-muted-foreground"
                     >
                       Declined
                     </span>
@@ -269,7 +273,7 @@ export function ReceiverView({ roomId }: { roomId: string }) {
                         className="h-0.5"
                       />
                     </div>
-                    <div className="flex justify-between text-xs text-zinc-600 mt-1">
+                    <div className="flex justify-between text-xs text-muted-foreground/70 mt-1">
                       <span>{formatSpeed(p.speed)}</span>
                       <span>ETA: {formatEta(bytesLeft, p.speed)}</span>
                     </div>
@@ -295,14 +299,14 @@ export function ReceiverView({ roomId }: { roomId: string }) {
           className="flex flex-col items-center gap-4 py-10 text-center"
         >
           <Lock className="h-12 w-12 text-primary mb-4" aria-hidden />
-          <h2 className="text-xl font-semibold tracking-tight text-white">
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">
             All Files Received
           </h2>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-muted-foreground">
             Your files have been saved securely.
           </p>
           {transferDuration !== null && (
-            <p className="text-xs text-zinc-500 tabular-nums">
+            <p className="text-xs text-muted-foreground/70 tabular-nums">
               Completed in {formatDuration(transferDuration)}
             </p>
           )}

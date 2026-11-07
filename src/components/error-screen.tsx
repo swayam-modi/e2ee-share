@@ -32,13 +32,13 @@ export function ErrorScreen({
         <XCircle className="h-4 w-4 text-destructive shrink-0" />
         <p className="text-sm font-medium text-destructive">{title}</p>
       </div>
-      <p className="text-xs text-zinc-400 leading-relaxed">{message}</p>
+      <p className="text-xs text-muted-foreground leading-relaxed">{message}</p>
       {onRetry && (
         <Button
           variant="outline"
           size="sm"
           onClick={onRetry}
-          className="mt-4 border-white/10 text-zinc-300 hover:text-white"
+          className="mt-4 border-border text-muted-foreground hover:text-foreground"
         >
           Try Again
         </Button>

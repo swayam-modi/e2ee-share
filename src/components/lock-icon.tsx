@@ -8,7 +8,7 @@ export function LockIcon() {
     <TooltipProvider delay={200}>
       <Tooltip>
         <TooltipTrigger
-          className="inline-flex size-8 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:text-zinc-300"
+          className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
           aria-label="How is this secure?"
         >
           <Lock className="h-4 w-4" />

@@ -9,6 +9,7 @@ import { FingerprintCard } from "@/components/fingerprint-card";
 import { StatusBanner } from "@/components/status-banner";
 import { ErrorScreen } from "@/components/error-screen";
 import { LockIcon } from "@/components/lock-icon";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { formatDuration } from "@/lib/format";
@@ -108,15 +109,11 @@ export function SenderView() {
     setSelectedFiles([]);
   }, [actions]);
 
-  // Show share link only while waiting/approving — NOT during active transfer
+  // Show share link only while waiting for receiver to open the link
   const showShareLink =
     state.shareUrl &&
     state.expiresAt &&
-    state.phase !== "idle" &&
-    state.phase !== "transferring" &&
-    state.phase !== "done" &&
-    state.phase !== "failed" &&
-    state.phase !== "cancelled";
+    state.phase === "waitingForReceiver";
 
   return (
     <div className="w-full max-w-lg flex flex-col gap-6 py-2">
@@ -125,10 +122,13 @@ export function SenderView() {
         ref={headerRef}
         className="flex items-center justify-between mb-2"
       >
-        <h1 className="text-xl font-semibold tracking-tight text-white">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
           Send Files Securely
         </h1>
-        <LockIcon />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <LockIcon />
+        </div>
       </header>
 
       {/* Error state */}
@@ -147,7 +147,7 @@ export function SenderView() {
           <Button
             variant="outline"
             onClick={handleReset}
-            className="border-white/10 text-zinc-300 hover:text-white"
+            className="border-border text-muted-foreground hover:text-foreground"
           >
             Start Over
           </Button>
@@ -161,14 +161,14 @@ export function SenderView() {
           className="flex flex-col items-center gap-4 py-10 text-center"
         >
           <Lock className="h-12 w-12 text-primary mb-4" aria-hidden />
-          <h2 className="text-xl font-semibold tracking-tight text-white">
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">
             Transfer Complete
           </h2>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-muted-foreground">
             All files were sent successfully.
           </p>
           {transferDuration !== null && (
-            <p className="text-xs text-zinc-500 tabular-nums">
+            <p className="text-xs text-muted-foreground/70 tabular-nums">
               Completed in {formatDuration(transferDuration)}
             </p>
           )}
@@ -284,7 +284,7 @@ export function SenderView() {
               variant="ghost"
               size="sm"
               aria-label="Cancel transfer"
-              className="self-start text-zinc-500 hover:text-destructive transition-colors"
+              className="self-start text-muted-foreground hover:text-destructive transition-colors"
             >
               Cancel Transfer
             </Button>

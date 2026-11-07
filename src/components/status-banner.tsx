@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import gsap from "gsap";
 
 const variantStyles = {
-  info: "border-zinc-600",
+  info: "border-border",
   success: "border-success",
   warning: "border-amber-500",
   error: "border-destructive",
@@ -52,7 +52,7 @@ export function StatusBanner({
       {...props}
     >
       <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-      <span className="text-sm text-zinc-300">{message}</span>
+      <span className="text-sm text-foreground">{message}</span>
     </div>
   );
 }
