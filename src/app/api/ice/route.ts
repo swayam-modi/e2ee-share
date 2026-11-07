@@ -26,7 +26,9 @@ export async function GET(req: NextRequest) {
   const iceServers: IceServerConfig[] = [{ urls: stunUrls }];
   const turnRaw = process.env.TURN_URLS ?? "";
   const turnSecret = process.env.TURN_SECRET;
-  if (turnRaw && turnSecret) {
+  if (turnSecret && turnSecret.length < 32) {
+    console.error("[ice] TURN_SECRET is too short — must be at least 32 characters. TURN credentials will not be issued.");
+  } else if (turnRaw && turnSecret) {
     const turnUrls = turnRaw.includes(",")
       ? turnRaw
           .split(",")

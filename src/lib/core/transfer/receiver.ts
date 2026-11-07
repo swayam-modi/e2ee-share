@@ -13,6 +13,8 @@ import {
   FRAME_TYPE_DATA,
   ProtocolError,
 } from '../../protocol/index';
+import { controlSchema } from '../../protocol/control';
+import type { ControlFileOfferMessage } from '../../protocol/control';
 import type { Channel } from '../rtc/channel';
 import { decryptFrame } from '../crypto/aead';
 import { sanitizeFilename } from './sanitize';
@@ -169,26 +171,29 @@ export class FileReceiver {
     this.controlSeqIn++;
 
     const text = new TextDecoder('utf-8', { fatal: true }).decode(plaintext);
-    const msg = JSON.parse(text) as {
-      t: string;
-      fileIndex?: number;
-      name?: string;
-      size?: number;
-      mime?: string;
-      chunkCount?: number;
-      reason?: string;
-    };
+    let rawParsed: unknown;
+    try {
+      rawParsed = JSON.parse(text);
+    } catch {
+      throw new ProtocolError(ErrorCodes.INVALID_MESSAGE, 'Control frame contains invalid JSON');
+    }
+
+    const parseResult = controlSchema.safeParse(rawParsed);
+    if (!parseResult.success) {
+      throw new ProtocolError(ErrorCodes.INVALID_MESSAGE, 'Control message failed schema validation');
+    }
+    const msg = parseResult.data;
 
     switch (msg.t) {
       case 'file-offer': {
-        await this.handleFileOffer(msg as Parameters<typeof this.handleFileOffer>[0], key, channel);
+        await this.handleFileOffer(msg, key, channel);
         return false;
       }
       case 'cancel': {
         await this.abortAllSinks();
         this.done = true;
         this.opts.onError(
-          new ProtocolError(ErrorCodes.CHANNEL_CLOSED, `Remote cancelled: ${msg.reason ?? ''}`),
+          new ProtocolError(ErrorCodes.CHANNEL_CLOSED, `Remote cancelled: ${'reason' in msg ? (msg.reason ?? '') : ''}`),
         );
         return true;
       }
@@ -202,22 +207,15 @@ export class FileReceiver {
   }
 
   private async handleFileOffer(
-    msg: {
-      t: string;
-      fileIndex?: number;
-      name?: string;
-      size?: number;
-      mime?: string;
-      chunkCount?: number;
-    },
+    msg: ControlFileOfferMessage,
     key: CryptoKey,
     channel: Channel,
   ): Promise<void> {
-    const fileIndex = msg.fileIndex ?? 0;
-    const rawName = msg.name ?? 'download';
-    const size = msg.size ?? 0;
-    const mime = msg.mime ?? 'application/octet-stream';
-    const chunkCount = msg.chunkCount ?? 1;
+    const fileIndex = msg.fileIndex;
+    const rawName = msg.name;
+    const size = msg.size;
+    const mime = msg.mime;
+    const chunkCount = msg.chunkCount;
 
     const sanitized = sanitizeFilename(rawName);
 

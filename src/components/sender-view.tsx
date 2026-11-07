@@ -281,19 +281,32 @@ export function SenderView() {
             <FileList files={selectedFiles} progress={state.progress} />
             <Button
               onClick={actions.cancel}
-              variant="ghost"
+              variant="outline"
               size="sm"
               aria-label="Cancel transfer"
-              className="self-start text-muted-foreground hover:text-destructive transition-colors"
+              className="self-start text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors"
             >
               Cancel Transfer
             </Button>
           </>
         )}
 
-      {state.phase === "transferring" && selectedFiles.length > 0 && (
-        <StatusBanner message="Sending files…" variant="info" />
-      )}
+      {/* Waiting for receiver to accept the file offer */}
+      {state.phase === "transferring" &&
+        selectedFiles.length > 0 &&
+        state.progress.size === 0 && (
+          <StatusBanner
+            message="Waiting for receiver to accept the files…"
+            variant="info"
+          />
+        )}
+
+      {/* Actually sending */}
+      {state.phase === "transferring" &&
+        selectedFiles.length > 0 &&
+        state.progress.size > 0 && (
+          <StatusBanner message="Sending files…" variant="info" />
+        )}
     </div>
   );
 }

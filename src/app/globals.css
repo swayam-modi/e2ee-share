@@ -128,6 +128,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Shimmer animation for progress bars */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+.animate-shimmer {
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
 /* Monospace fingerprint display */
 .fingerprint-mono {
   font-family: var(--font-mono), ui-monospace, monospace;

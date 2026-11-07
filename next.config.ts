@@ -7,11 +7,8 @@ const config: NextConfig = {
   output: "standalone",
   outputFileTracingRoot: path.resolve("./"),
 
-  // Allow dev HMR connections from network IPs (e.g. opening on another device)
-  allowedDevOrigins: [
-    "192.168.102.114",
-    "gripple-denice-metaphrastically.ngrok-free.dev",
-  ],
+  // Allow dev HMR connections from network IPs — load from env, never hardcode
+  allowedDevOrigins: process.env.ALLOWED_DEV_ORIGINS?.split(",").map((s) => s.trim()).filter(Boolean) ?? [],
 
   async headers() {
     // Strict base CSP for all environments; dev layers unsafe-inline/eval and
@@ -40,6 +37,9 @@ const config: NextConfig = {
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "Referrer-Policy", value: "no-referrer" },
       { key: "Content-Security-Policy", value: csp },
+      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+      // HSTS: only in production — avoids breaking local HTTP dev
+      ...(isDev ? [] : [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" }]),
     ];
 
     return [{ source: "/(.*)", headers: securityHeaders }];

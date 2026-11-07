@@ -18,6 +18,8 @@ export interface FileOfferUIState {
 
 export interface ReceiverSessionState {
   phase: ReceiverState;
+  cancelled: boolean;
+  autoAccepting: boolean;
   fingerprint: string | null;
   error: ProtocolError | null;
   fileOffers: FileOfferUIState[];
@@ -27,10 +29,14 @@ export interface ReceiverSessionState {
 export interface ReceiverSessionActions {
   start: (roomId: string, secret: Uint8Array) => void;
   close: () => void;
+  cancel: () => void;
+  acceptAll: () => void;
 }
 
 const initialState: ReceiverSessionState = {
   phase: "idle",
+  cancelled: false,
+  autoAccepting: false,
   fingerprint: null,
   error: null,
   fileOffers: [],
@@ -79,11 +85,14 @@ export function useReceiverSession(): [
     Map<number, (sink: import("@/lib/core").FileSink | null) => void>
   >(new Map());
 
+  // When true, every incoming offer is accepted automatically
+  const autoAcceptRef = useRef(false);
+
   const start = useCallback(
     (roomId: string, secret: Uint8Array) => {
       sessionRef.current?.close();
       sessionRef.current = null;
-
+      autoAcceptRef.current = false;
       setState({ ...initialState, phase: "preparingKeys" });
 
       const session = new ReceiverSession({
@@ -96,9 +105,25 @@ export function useReceiverSession(): [
             ...prev,
             fileOffers: [
               ...prev.fileOffers,
-              { offer, status: "pending" as const },
+              { offer, status: autoAcceptRef.current ? ("accepted" as const) : ("pending" as const) },
             ],
           }));
+
+          // If auto-accept is on, resolve immediately with a BlobSink
+          if (autoAcceptRef.current) {
+            if (offer.size > FS_ACCESS_THRESHOLD && hasFsAccess()) {
+              try {
+                const fh = await (window as unknown as FsaWindow).showSaveFilePicker({
+                  suggestedName: offer.name,
+                });
+                const writable = await fh.createWritable();
+                return new FsAccessSink(writable);
+              } catch {
+                // fall through
+              }
+            }
+            return new BlobSink(offer.name);
+          }
 
           return new Promise<import("@/lib/core").FileSink | null>(
             (resolve) => {
@@ -183,12 +208,35 @@ export function useReceiverSession(): [
   const actionsRef = useRef({ acceptOffer, declineOffer });
   actionsRef.current = { acceptOffer, declineOffer };
 
+  const cancel = useCallback(() => {
+    sessionRef.current?.close();
+    sessionRef.current = null;
+    autoAcceptRef.current = false;
+    setState((prev) => ({ ...prev, cancelled: true, autoAccepting: false }));
+  }, []);
+
+  const acceptAll = useCallback(() => {
+    // Flip the flag so all future offers are auto-accepted
+    autoAcceptRef.current = true;
+    setState((prev) => ({ ...prev, autoAccepting: true }));
+    // Accept any offers that are already pending right now
+    setState((prev) => {
+      const pending = prev.fileOffers.filter((f) => f.status === "pending");
+      for (const { offer } of pending) {
+        void actionsRef.current.acceptOffer(offer.fileIndex, offer);
+      }
+      return prev;
+    });
+  }, []);
+
   const actions: ReceiverSessionActions & {
     acceptOffer: (fileIndex: number, offer: FileOfferInfo) => Promise<void>;
     declineOffer: (fileIndex: number) => void;
   } = {
     start,
     close,
+    cancel,
+    acceptAll,
     acceptOffer: useCallback(
       (fileIndex: number, offer: FileOfferInfo) =>
         actionsRef.current.acceptOffer(fileIndex, offer),
