@@ -1,80 +1,36 @@
-# E2EE P2P File Sharing (`e2ee-share`)
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Browser-based, end-to-end encrypted peer-to-peer file sharing between two users. A lightweight signaling server introduces the browsers, after which files transfer directly browser-to-browser via WebRTC DataChannels, encrypted in streaming chunks using AES-256-GCM.
+## Getting Started
 
-## Key Features
-
-- **End-to-End Encryption**: Encrypted with AES-256-GCM at the application layer. The signaling server never sees plaintext, filenames, or encryption keys.
-- **Direct P2P Transfer**: Data flows directly between peers over WebRTC DataChannel (with optional TURN relay when direct NAT traversal is impossible).
-- **Streaming Chunks**: Handles large files in 15 KiB chunks with low memory overhead.
-- **Zero Third-Party Dependencies**: Self-hosted, no CDNs, no external tracking scripts or fonts.
-- **MITM Protection**: Bearer link contains a URL fragment secret (`#...`) that is never sent to the server. Signaling envelopes are HMAC-authenticated with keys derived from this secret.
-
-## Monorepo Structure
-
-```text
-e2ee-share/
-├── packages/
-│   ├── protocol/   # Shared types, Zod schemas, frame formats, constants
-│   └── core/       # Browser-agnostic crypto, WebRTC, signaling, and transfer logic
-├── apps/
-│   ├── server/     # Fastify + WebSocket signaling server
-│   └── web/        # Vite + React 18 client application
-└── docs/           # Architecture, protocol, threat model, and design decisions
-```
-
-## Prerequisites
-
-- **Node.js**: 22.x or later (see `.nvmrc`)
-- **pnpm**: 9.x or later
-
-## Quick Start
-
-### 1. Install Dependencies
+First, run the development server:
 
 ```bash
-pnpm install
-```
-
-### 2. Configure Environment
-
-Copy `.env.example` to `.env`:
-
-```bash
-cp .env.example .env
-```
-
-### 3. Development
-
-Run the server and web client concurrently:
-
-```bash
+npm run dev
+# or
+yarn dev
+# or
 pnpm dev
+# or
+bun dev
 ```
 
-- Web UI: [http://localhost:5173](http://localhost:5173)
-- Signaling Server: [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
 
-### 4. Build, Typecheck & Test
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```bash
-# Build all packages and applications
-pnpm build
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-# Typecheck all packages
-pnpm typecheck
+## Learn More
 
-# Lint all code
-pnpm lint
+To learn more about Next.js, take a look at the following resources:
 
-# Run unit and integration tests
-pnpm test
-```
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Security Model Overview
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-1. **Room Creation**: Sender asks server for a random `roomId` (16 bytes base64url).
-2. **Key Generation**: Sender generates a 32-byte random `secret` stored only in the URL hash fragment (`#<secret>`).
-3. **Authentication**: Both peers derive an HMAC auth key via HKDF from the secret and authenticate every signaling message.
-4. **Key Exchange**: Ephemeral RSA-OAEP key exchange establishes a per-session AES-256 session key.
-5. **Data Framing**: Each chunk is framed with an 11-byte header authenticated as AAD in AES-GCM with deterministic nonces.
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
